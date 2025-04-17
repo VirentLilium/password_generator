@@ -31,7 +31,6 @@ def get_int_input(prompt, min_value=None, max_value=None):
             print("Ошибка! Пожалуйста, введите целое положительное число.")
 
 
-# проверка ответов пользователя / check user responses
 def get_yes_no_input(prompt):
     """
        Запрашивает у пользователя ответ 'да' или 'нет' в разных формах
@@ -48,7 +47,6 @@ def get_yes_no_input(prompt):
             print("Некорректный ответ! Введите 'да' или 'нет'.")
 
 
-# сбор пользовательских настроек / get user settings
 def get_user_settings():
     """
         Запрашивает у пользователя, какие группы символов включать в пароль,
@@ -73,7 +71,6 @@ def get_user_settings():
     return selected_groups, exclude_ambiguous
 
 
-# составление набора символов для генерации пароля / prepare symbols
 def prepare_symbols(groups, remove_ambiguous):
     """
        Подготавливает символы для генерации пароля:
@@ -94,7 +91,6 @@ def prepare_symbols(groups, remove_ambiguous):
     return groups, s
 
 
-# составление набора символов для генерации пароля / prepare symbols
 def generate_password(groups, length, char_pool):
     """
        Генерирует один пароль заданной длины:
@@ -117,7 +113,6 @@ def generate_password(groups, length, char_pool):
     return password
 
 
-# запуск программы / run program
 def main():
     """
        Основная функция: управляет вводом пользователя,
@@ -140,4 +135,3 @@ def main():
 
 
 main()
-
