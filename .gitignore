@@ -1,0 +1,9 @@
+# Ignore all IDE-specific files (PyCharm, IntelliJ)
+.idea/
+*.iml
+misc.xml
+modules.xml
+vcs.xml
+inspectionProfiles/
+shelf/
+workspace.xml
