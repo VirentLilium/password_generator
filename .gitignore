@@ -1,9 +1,29 @@
-# Ignore all IDE-specific files (PyCharm, IntelliJ)
-.idea/
-*.iml
-misc.xml
-modules.xml
-vcs.xml
-inspectionProfiles/
-shelf/
-workspace.xml
+# Python-specific files
+*.py[cod]              # Byte-compiled / optimized / DLL files
+__pycache__/            # Python bytecode cache
+*.pyo                   # Optimized Python files
+# Virtual Environment
+venv/                   # Virtual environment folder
+env/                    # Virtual environment folder
+ENV/                    # Another possible name for the virtual environment folder
+# IDEs and editors
+.idea/                  # PyCharm project settings
+.vscode/                # Visual Studio Code settings
+*.iml                   # IntelliJ project files
+# OS-specific files
+.DS_Store               # macOS system file
+Thumbs.db               # Windows system file
+# Package distribution
+*.egg                   # Python egg files
+*.egg-info/             # Egg metadata
+dist/                   # Distribution folder
+build/                  # Build folder
+*.tar.gz                # Package tarballs
+# Jupyter Notebooks
+.ipynb_checkpoints/     # Jupyter notebook checkpoints
+# Pylint and other static analysis tools
+pylint_report.txt       # Output file from pylint (if any)
+# Temporary files
+*.log                   # Log files
+*.bak                   # Backup files
+*.swp                   # Swap files (from editors like Vim)
