@@ -1,137 +1,194 @@
 import random
 import string
 
-symbol_groups = {
+symbol_groups: dict[str, str] = {
     'цифры': string.digits,
     'строчные буквы': string.ascii_lowercase,
     'прописные буквы': string.ascii_uppercase,
     'знаки пунктуации': string.punctuation
 }
+
 ambiguous_symbols = 'il1Lo0O'  # сомнительные символы
 
 
-def get_int_input(prompt, min_value=None, max_value=None):
+def get_int_input(
+    prompt: str,
+    min_value: int | None = None,
+    max_value: int | None = None,
+) -> int:
     """
-       Запрашивает у пользователя целое число с возможной проверкой диапазона
+    Запрашивает у пользователя целое число.
 
-       Prompts the user for an integer with optional range validation
-       """
+    При необходимости проверяет, что число входит в заданный диапазон.
+
+    :param prompt: Текст приглашения для ввода.
+    :param min_value: Минимально допустимое значение.
+    :param max_value: Максимально допустимое значение.
+    :return: Корректное целое число.
+    """
     while True:
         try:
             value = int(input(prompt))
+
             if (min_value is not None and value < min_value):
-                print(f"Число должно быть не меньше {min_value}.")
+                print(f'Число должно быть не меньше {min_value}.')
                 continue
+
             if (max_value is not None and value > max_value):
-                print(f"Число должно быть не больше {max_value}.")
+                print(f'Число должно быть не больше {max_value}.')
                 continue
+
             return value
 
         except ValueError:
-            print("Ошибка! Пожалуйста, введите целое положительное число.")
+            print('Ошибка! Пожалуйста, введите целое положительное число.')
 
 
-def get_yes_no_input(prompt):
+def get_yes_no_input(prompt: str) -> bool:
     """
-       Запрашивает у пользователя ответ 'да' или 'нет' в разных формах
+    Запрашивает у пользователя ответ "да" или "нет".
 
-       Prompts the user for a yes/no answer
-       """
+    Допускает несколько вариантов положительного и отрицательного ответа.
+
+    :param prompt: Текст вопроса для пользователя.
+    :return: True для положительного ответа, False для отрицательного.
+    """
     while True:
         answer = input(prompt).strip().lower()
+
         if answer in ['да', 'lf', 'yes', '+']:
             return True
-        elif answer in ['нет', 'ytn', 'no', '-']:
+
+        if answer in ['нет', 'ytn', 'no', '-']:
             return False
-        else:
-            print("Некорректный ответ! Введите 'да' или 'нет'.")
+
+        print('Некорректный ответ! Введите "да" или "нет".')
 
 
-def get_user_settings():
+def get_user_settings() -> tuple[dict[str, str], bool]:
     """
-        Запрашивает у пользователя, какие группы символов включать в пароль,
-        и следует ли исключать неоднозначные символы.
+    Запрашивает пользовательские настройки генерации пароля.
 
-        Asks the user which character groups to include in the password,
-        and whether to exclude ambiguous characters.
-        """
-    selected_groups = dict()
+    Пользователь выбирает группы символов для пароля и решает,
+    нужно ли исключать неоднозначные символы.
 
-    for key, value in symbol_groups.items():
-        include = get_yes_no_input(f"Включать ли в пароль {key}?")
-        if include:
-            selected_groups[key] = value
+    :return: Кортеж из выбранных групп символов и флага исключения
+        неоднозначных символов.
+    """
+    while True:
+        selected_groups: dict[str, str] = {}
 
-    if not selected_groups:
-        print("Вы не выбрали ни одну группу символов. Пожалуйста, выберите хотя бы одну.")
-        return get_user_settings()
+        for key, value in symbol_groups.items():
+            include = get_yes_no_input(
+                f'Включать ли в пароль {key}? '
+            )
 
-    exclude_ambiguous = get_yes_no_input(f"Исключить ли неоднозначные символы {ambiguous_symbols}?")
+            if include:
+                selected_groups[key] = value
+
+        if selected_groups:
+            break
+
+        print(
+            'Вы не выбрали ни одну группу символов. '
+            'Пожалуйста, выберите хотя бы одну.'
+        )
+
+    exclude_ambiguous = get_yes_no_input(
+        f'Исключить ли неоднозначные символы {ambiguous_symbols}?'
+    )
 
     return selected_groups, exclude_ambiguous
 
 
-def prepare_symbols(groups, remove_ambiguous):
+def prepare_symbols(
+    groups: dict[str, str],
+    remove_ambiguous: bool,
+) -> tuple[dict[str, str], str]:
     """
-       Подготавливает символы для генерации пароля:
-       объединяет выбранные группы, и при необходимости удаляет неоднозначные символы.
+    Подготавливает символы для генерации пароля.
 
-       Prepares characters for password generation:
-       merges selected groups and removes ambiguous symbols if needed.
-       """
+    Объединяет выбранные группы символов в общий набор. Если нужно,
+    удаляет из выбранных групп неоднозначные символы.
+
+    :param groups: Выбранные пользователем группы символов.
+    :param remove_ambiguous: Нужно ли удалить неоднозначные символы.
+    :return: Кортеж из обновлённых групп символов и общего набора символов.
+    """
     if remove_ambiguous:
-        groups_without_ambiguous = {k: ''.join([ch for ch in v if ch not in ambiguous_symbols]) for k, v in
-                                    groups.items()}
-        s = ''.join(
-            value for key, value in groups_without_ambiguous.items())  # строка со всеми символами, кроме сомнительных
-        return groups_without_ambiguous, s
-    else:
-        s = ''.join(value for key, value in groups.items())  # строка со всеми символами
+        groups = {
+            key: ''.join(
+                char for char in value if char not in ambiguous_symbols
+            )
+            for key, value in groups.items()
+        }
 
-    return groups, s
+    # строка со всеми символами, кроме сомнительных
+    char_pool = ''.join(groups.values())
+
+    return groups, char_pool
 
 
-def generate_password(groups, length, char_pool):
+def generate_password(
+    groups: dict[str, str],
+    length: int,
+    char_pool: str,
+) -> str:
     """
-       Генерирует один пароль заданной длины:
-       включает хотя бы по одному символу из каждой выбранной группы,
-       и заполняет оставшиеся символы случайными из общего набора.
+    Генерирует пароль заданной длины.
 
-       Generates a password of given length:
-       includes at least one character from each selected group,
-       and fills the rest with random characters from the full pool.
-       """
-    password = []
-    for key, value in groups.items():
-        password.append(random.choice(value))
+    Пароль содержит хотя бы один символ из каждой выбранной группы.
+    Остальные символы выбираются случайно из общего набора.
 
-    while len(password) < length:
-        password.append(random.choice(char_pool))
-
-    random.shuffle(password)
-    password = ''.join(password)
-    return password
-
-
-def main():
+    :param groups: Группы символов для генерации пароля.
+    :param length: Длина пароля.
+    :param char_pool: Общий набор разрешённых символов.
+    :return: Сгенерированный пароль.
     """
-       Основная функция: управляет вводом пользователя,
-       собирает настройки и генерирует указанные пароли.
+    password_chars = [
+        random.choice(chars) for chars in groups.values()
+    ]
 
-       Main function: handles user input,
-       collects settings and generates the requested number of passwords.
-       """
-    pwd_quantity = get_int_input('Сколько паролей вам нужно сгенерировать? Введите число. ', min_value=1, max_value=100)
+    while len(password_chars) < length:
+        password_chars.append(random.choice(char_pool))
+
+    random.shuffle(password_chars)
+
+    return ''.join(password_chars)
+
+
+def main() -> None:
+    """Функция запускает генератор паролей."""
+    pwd_quantity = get_int_input(
+        'Сколько паролей вам нужно сгенерировать? Введите число. ',
+        min_value=1,
+        max_value=100,
+    )
 
     pwd_length = get_int_input(
-        'Какой длины должен быть пароль? Введите число, пароль должен включать от 8 до 20 символов включительно. ',
-        min_value=8, max_value=20)
+        'Какой длины должен быть пароль? '
+        'Введите число, пароль должен включать '
+        'от 8 до 20 символов включительно. ',
+        min_value=8,
+        max_value=20,
+    )
 
     selected_groups, exclude_ambiguous = get_user_settings()
-    groups_of_symbols, char_pool = prepare_symbols(selected_groups, exclude_ambiguous)
+
+    groups_of_symbols, char_pool = prepare_symbols(
+        selected_groups,
+        exclude_ambiguous
+    )
 
     for _ in range(pwd_quantity):
-        print(generate_password(groups_of_symbols, pwd_length, char_pool))
+        print(
+            generate_password(
+                groups_of_symbols,
+                pwd_length,
+                char_pool,
+            )
+        )
 
 
-main()
+if __name__ == '__main__':
+    main()
